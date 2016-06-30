@@ -5,7 +5,7 @@ import {Provider} from 'react-redux';
 import io from 'socket.io-client';
 import App from './components/app'
 
-const socket = io(`${location.protocol}//${location.hostname}:8080`);
+const socket = io.connect();
 socket.on('state', state =>
   console.log(state)
 );
