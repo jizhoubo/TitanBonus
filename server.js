@@ -1,15 +1,37 @@
-const path = require('path')
-const express = require('express')
+import express from 'express'
+import path from 'path'
 
-module.exports = {
-  app: function () {
-    const app = express()
-    const indexPath = path.join(__dirname, 'index.html')
-    const publicPath = express.static(path.join(__dirname, 'public'))
+const port = (process.env.PORT || 8080)
 
-    app.use('/public', publicPath)
-    app.get('/', function (_, res) { res.sendFile(indexPath) })
+// module.exports = {
+//   app: function () {
+//     const app = express()
+//     const indexPath = path.join(__dirname, 'index.html')
+//     const publicPath = express.static(path.join(__dirname, 'public'))
 
-    return app
-  }
+//     app.use('/public', publicPath)
+//     app.get('/', function (_, res) { res.sendFile(indexPath) })
+
+//     return app
+//   }
+// }
+
+export function startServer(store) {
+	const app = express()
+  const indexPath = path.join(__dirname, 'index.html')
+  const publicPath = express.static(path.join(__dirname, 'public'))
+
+  app.use('/public', publicPath)
+  app.get('/', function (_, res) { res.sendFile(indexPath) })
+
+  const io = require('socket.io').listen(app.listen(port));
+
+  store.subscribe(
+  	() => io.emit('state', store.getState().toJS())
+  );
+
+  io.on('connection', (socket) => {
+    socket.emit('state', store.getState().toJS());
+    socket.on('action', store.dispatch.bind(store));
+  });
 }
