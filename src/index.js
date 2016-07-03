@@ -1,13 +1,29 @@
 import React from 'react'
-import { render } from 'react-dom'
-import {createStore} from 'redux';
-import {Provider} from 'react-redux';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
 import io from 'socket.io-client';
-import App from './components/app'
+
+import reducer from './reducers/index';
+import {setState} from './actions/index';
+import remoteActionMiddleware from './remote_action_middleware';
+import App from './components/app';
 
 const socket = io.connect();
-socket.on('state', state =>
-  console.log(state)
+socket.on('state', state => {
+	  store.dispatch(setState(state));
+	}
 );
 
-render(<App/>, document.getElementById('main'))
+const createStoreWithMiddleware = applyMiddleware(
+  remoteActionMiddleware(socket)
+)(createStore);
+const store = createStoreWithMiddleware(reducer);
+
+
+ReactDOM.render(
+  <Provider store={store}>  
+  	<App />   
+  </Provider>,
+  document.getElementById('main')
+);

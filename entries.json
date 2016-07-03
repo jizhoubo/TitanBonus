@@ -1,7 +1,7 @@
 [
-  "Zhoubo",
-  "Sam",
-  "Annie",
-  "Eva",
-  "Kiki"
+  {"name": "Zhoubo Ji", "photo":"https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/11070991_10204247569209175_2715598359310148081_n.jpg?oh=9027f865e8b3029ea52bb60e49e2841c&oe=57FCD07C"},
+  {"name": "Sam Huang", "photo":"https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/1914643_162088647365_2590088_n.jpg?oh=b1f0052e5e649a0f47cebbf68333fd54&oe=57EA8DF1"},
+  {"name": "Annie Tang", "photo":"https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/1531776_704609252890745_1124214910_n.jpg?oh=f886a7193a426ed0b68d5b829331fd7c&oe=5836AB71"},
+  {"name": "Eva Chen", "photo":"https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-0/p206x206/10404207_10204474292842695_6196032562766970122_n.jpg?oh=443524ff1e6ab147788a4b303151f167&oe=57F94959"},
+  {"name": "Kiki Chang", "photo":"https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-1/11050645_1453771714944473_1892402248731548506_n.jpg?oh=d833ae57f8de96ba869763dc9f38abb1&oe=5835D6FD"}
 ]
