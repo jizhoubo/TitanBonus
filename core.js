@@ -32,7 +32,6 @@ export function vote(state, ratios) {
 		currentRunningVotes.find(c => c.name === ratio.name).percents.push(ratio.percent);
 	});
 	if (!currentRunningVotes.some(votes => votes.percents.length < 5)) {
-		console.log("round finish", currentRunningVotes);
 		return state.set('roundFinish', true)
 								.set('round', state.get('round') + 1)
 								.set('voted', 0)
@@ -59,7 +58,7 @@ export function getClientStateFromServerState(serverState) {
 		voters: serverState.voters,
 		votes: serverState.votes.map(votes => {
 			return {
-				name: votes.name, percents: votes.percents.sort(), photo: votes.photo
+				name: votes.name, percents: votes.percents.sort((a, b) => parseInt(a) - parseInt(b)), photo: votes.photo
 			}
 		})
 	};

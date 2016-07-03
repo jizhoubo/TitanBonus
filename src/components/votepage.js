@@ -106,9 +106,9 @@ class VotePage extends Component {
 												{v.percents.map((percent, index) => {
 													return (
 														<span key={index} className="badge" style={
-															percent <= 5 ? {'backgroundColor': '#777'} 
-																					: percent <= 10 ? {'backgroundColor': '#f0ad4e'}
-																					: percent <= 20 ? {'backgroundColor': '#5cb85c'}
+															parseInt(percent) <= 5 ? {'backgroundColor': '#777'} 
+																					: parseInt(percent) <= 10 ? {'backgroundColor': '#f0ad4e'}
+																					: parseInt(percent) <= 20 ? {'backgroundColor': '#5cb85c'}
 																					: {'backgroundColor': '#d9534f'}}>{percent}%</span>
 													)
 												})}
