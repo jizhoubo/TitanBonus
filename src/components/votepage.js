@@ -2,16 +2,20 @@ import {Map, fromJS} from 'immutable';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { Notification } from 'react-notification';
 import { vote } from '../actions/index';
 import ProgressBar from './progress_bar';
+import Introduction from './introduction';
 
 class VotePage extends Component {
 	constructor(props) {
     super(props);
     this.state = {
-    	votes:[]
+    	votes:[],
+    	voted: false,
+    	showingNotification: false
     };
-    this.onButtonClick = this.onButtonClick.bind(this);
+    this.onSubmitButtonClick = this.onSubmitButtonClick.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -23,10 +27,14 @@ class VotePage extends Component {
 			  				percent: this.state.votes.some(v => v.name === vote.name) ? this.state.votes.find(v => v.name === vote.name).percent : 0
 			  			})
 			  		}, []);
-  	console.log("clientVotes", clientVotes);
   	this.setState({
   		votes: clientVotes
   	})
+  	if (props.voted === 0) {
+  		this.setState({
+  			voted: false
+  		});
+  	}
   }
 
   onInputChange(name, event) {
@@ -39,8 +47,39 @@ class VotePage extends Component {
   	});
   }
 
-  onButtonClick() {
-  	console.log("onButtonClick", this.state);
+  onMinusButtonClick(name) {
+  	const currentPercent = parseInt(this.state.votes.find(v => v.name === name).percent, 10);
+  	const newPercent = currentPercent - 1 >= 0 ? currentPercent - 1 : currentPercent;  	
+  	const newVotes = this.state.votes
+  										.filter(vote => vote.name !== name)
+  										.concat({name: name, percent: newPercent});
+  	this.setState({
+  		votes: newVotes
+  	});
+  }
+
+  onPlusButtonClick(name) {
+  	const currentPercent = parseInt(this.state.votes.find(v => v.name === name).percent, 10);
+  	const newPercent = currentPercent + 1 <= 100 ? currentPercent + 1 : currentPercent;
+  	const newVotes = this.state.votes
+  										.filter(vote => vote.name !== name)
+  										.concat({name: name, percent: newPercent});
+  	this.setState({
+  		votes: newVotes
+  	});
+  }
+
+  onSubmitButtonClick() {
+  	const sum = this.state.votes.reduce((s, vote) => s + parseInt(vote.percent), 0);
+  	if (sum !== 100) {
+  		this.setState({
+  			showingNotification: true
+  		})
+  		return;
+  	}
+  	this.setState({
+  		voted: true
+  	});
   	this.props.vote(this.state.votes);
   }
 
@@ -52,16 +91,7 @@ class VotePage extends Component {
 		}
 		return (
 			<div>			
-			<div className="row">        
-        <div className="col-lg-12">
-          <h1 className="page-header">Bonus Distribution <small>It's not that awkward</small></h1>
-          <p>All of us have agreed that team decide how to distribute bonus, but since it may be qutie awkward and cause conflicts if one shows his / her distribution plan, we came up this procedure after discussion, trying to avoid conflicts</p>
-          <p>We will have 5 rounds or 8 rounds, depending on number of people who agree on the result of 5th round</p>
-        </div>
-        <div className="col-lg-12">
-          <h2 className="page-header">Make your choice</h2>
-        </div>
-      </div>
+				<Introduction />
 				<div className="row">
 					<ProgressBar title="Round" current={this.props.round} total={this.props.totalRounds} color={'red'} />
 					<ProgressBar title="# of Voted " current={this.props.voted} total={this.props.voters} color={'green'} />
@@ -90,21 +120,21 @@ class VotePage extends Component {
 													'height': '50px',
 													'lineHeight': '48px',
 													'marginBottom': '25px'
-												}}>{(v.percents.map(i => parseInt(i, 10)).reduce((a, b) => a + b, 0)) / v.percents.length}%													
+												}}>{Math.round((v.percents.map(i => parseInt(i, 10)).reduce((a, b) => a + b, 0)) / v.percents.length)}%													
 												</span>
 												<div className="input-group col-sm-6" style={{'left': '25%'}}>
-													<span className="input-group-btn">
-														<button type="button" className="btn btn-danger">-</button>
+													<span className="input-group-btn" onClick={this.onMinusButtonClick.bind(this,v.name)}>
+														<button className="btn btn-danger">-</button>
 													</span>
 													<input 
 														onChange={this.onInputChange.bind(this, v.name)}
 														type="text" 
-														value={this.state.votes[v.name]}
+														value={this.state.votes.find(x => x.name === v.name).percent}
 														placeholder="input 0~100"
 														className="form-control input-number" 
 														style={{'textAlign': 'center'}} />
 													<span className="input-group-btn">
-														<button type="button" className="btn btn-success">+</button>
+														<button onClick={this.onPlusButtonClick.bind(this,v.name)} className="btn btn-success">+</button>
 													</span>
 												</div>
 											</div>
@@ -115,8 +145,18 @@ class VotePage extends Component {
 					})}
 				</div>
 				<div className="input-group col-sm-10 center-block" style={{}}>
-					<button className="col-sm-12 btn btn-danger center-block" onClick={this.onButtonClick} >Submit</button>
+					<button 
+						className="col-sm-12 btn btn-danger center-block" 
+						onClick={this.onSubmitButtonClick} 
+						disabled={this.state.voted} 
+					>Submit</button>
 				</div>
+				<Notification
+				  isActive={this.state.showingNotification}
+				  message="All percent distribution must sum up to 100!"
+				  action="close"
+				  onClick={this.setState.bind(this,{'showingNotification': false})}
+				/>
 				<hr />
 			</div>
 		);
